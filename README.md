@@ -1,0 +1,3 @@
+# Gradientist
+
+![Screenshot](./screenshot.jpeg)
