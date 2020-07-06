@@ -59,22 +59,22 @@ class ViewController: UIViewController {
         scene.rootNode.addChildNode(cameraNode)
         
         // box
-        let protoBox = SCNBox(width: 0.8, height: 0.8, length: 0.8, chamferRadius: 0.0)
-        for i in 0..<16 {
-            for j in 0..<16 {
-                for k in 0..<16 {
-                    let i = Float(i), j = Float(j), k = Float(k)
+        let protoBox = SCNBox(width: 1.0, height: 1.0, length: 1.0, chamferRadius: 0.0)
+        for r in 0..<16 {
+            for g in 0..<16 {
+                for b in 0..<16 {
+                    let r = Float(r), g = Float(g), b = Float(b)
                     let box = protoBox.copy() as! SCNBox
                     let material = SCNMaterial()
                     material.diffuse.contents = UIColor(
-                        red: CGFloat(i / 16.0),
-                        green: CGFloat(j / 16.0),
-                        blue: CGFloat(k / 16.0),
+                        red: CGFloat(r / 15.0),
+                        green: CGFloat(g / 15.0),
+                        blue: CGFloat(b / 15.0),
                         alpha: 1.0
                     )
                     box.firstMaterial = material
                     let boxNode = SCNNode(geometry: box)
-                    boxNode.position = SCNVector3(Float(i), Float(j), Float(k))
+                    boxNode.position = SCNVector3(Float(g), Float(b), Float(r))
                     geometryNode.addChildNode(boxNode)
                 }
             }
