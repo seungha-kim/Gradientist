@@ -45,7 +45,7 @@ class ViewController: UIViewController {
         let omniLightNode = SCNNode()
         omniLightNode.light = SCNLight()
         omniLightNode.light!.type = .ambient
-        omniLightNode.light!.color = UIColor(white: 1, alpha: 1.0)
+        omniLightNode.light!.color = UIColor.black
         omniLightNode.position = SCNVector3(0, 50, 50)
         scene.rootNode.addChildNode(omniLightNode)
         
