@@ -54,7 +54,7 @@ class ViewController: UIViewController {
         camera.usesOrthographicProjection = true
         camera.orthographicScale = 30.0
         cameraNode.camera = camera
-        cameraNode.position = SCNVector3(0, 25, 25)
+        cameraNode.position = SCNVector3(0, 32, 32)
         cameraNode.eulerAngles = SCNVector3(-Double.pi / 4, 0, 0)
         scene.rootNode.addChildNode(cameraNode)
         
