@@ -15,21 +15,57 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2iV-V2-igE">
-                                <rect key="frame" x="0.0" y="44" width="414" height="818"/>
-                            </sceneKitView>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="QYJ-af-0pA">
+                                <rect key="frame" x="0.0" y="44" width="414" height="852"/>
+                                <subviews>
+                                    <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2iV-V2-igE">
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="612"/>
+                                    </sceneKitView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="EUa-Rs-zuJ">
+                                        <rect key="frame" x="0.0" y="612" width="414" height="240"/>
+                                        <subviews>
+                                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PDQ-jc-3Il">
+                                                <rect key="frame" x="0.0" y="0.0" width="414" height="160"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="160" id="n5l-Il-cSR"/>
+                                                </constraints>
+                                            </pickerView>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WWb-cx-hce">
+                                                <rect key="frame" x="0.0" y="160" width="414" height="80"/>
+                                                <subviews>
+                                                    <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="1xJ-0E-Ifb">
+                                                        <rect key="frame" x="14" y="8" width="386" height="31"/>
+                                                        <directionalEdgeInsets key="directionalLayoutMargins" top="8" leading="8" bottom="8" trailing="8"/>
+                                                    </slider>
+                                                </subviews>
+                                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                                <constraints>
+                                                    <constraint firstItem="1xJ-0E-Ifb" firstAttribute="top" secondItem="WWb-cx-hce" secondAttribute="top" constant="8" id="NgV-Bw-suJ"/>
+                                                    <constraint firstAttribute="trailing" secondItem="1xJ-0E-Ifb" secondAttribute="trailing" constant="16" id="blh-eN-tZt"/>
+                                                    <constraint firstItem="1xJ-0E-Ifb" firstAttribute="leading" secondItem="WWb-cx-hce" secondAttribute="leading" constant="16" id="ijD-Sa-NUn"/>
+                                                </constraints>
+                                            </view>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="240" id="oEi-ma-I6L"/>
+                                        </constraints>
+                                    </stackView>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="2iV-V2-igE" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="JXJ-cd-ZF8"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="2iV-V2-igE" secondAttribute="bottom" id="Ubk-XH-Wu2"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="2iV-V2-igE" secondAttribute="trailing" id="fVC-h1-hBf"/>
-                            <constraint firstItem="2iV-V2-igE" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="yR2-Hu-fm0"/>
+                            <constraint firstItem="QYJ-af-0pA" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="A38-2d-a8I"/>
+                            <constraint firstItem="QYJ-af-0pA" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="Tcr-4n-wKx"/>
+                            <constraint firstAttribute="bottom" secondItem="QYJ-af-0pA" secondAttribute="bottom" id="hcL-G0-nNP"/>
+                            <constraint firstItem="QYJ-af-0pA" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="vVE-gf-1vR"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="picker" destination="PDQ-jc-3Il" id="Ffu-ww-D5z"/>
                         <outlet property="sceneView" destination="2iV-V2-igE" id="B2s-bc-vj8"/>
+                        <outlet property="slider" destination="1xJ-0E-Ifb" id="Qnu-70-10E"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

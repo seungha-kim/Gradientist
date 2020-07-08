@@ -8,19 +8,55 @@
 
 import UIKit
 import SceneKit
+import simd
 
 enum ZoomState {
     case idle
     case zooming(start: Double)
 }
 
+enum PeelVisualization {
+    case redToBlack
+    case blueToBlack
+    case greenToBlack
+    case whiteToBlack
+    case cyanToRed
+    case magentaToGreen
+    case yellowToBlue
+    case onion
+    case sliceThroughBlackAndWhite
+}
+
+struct Coord: Hashable {
+    let r: Int
+    let g: Int
+    let b: Int
+}
+
 class ViewController: UIViewController {
     @IBOutlet weak var sceneView: SCNView!
-
+    @IBOutlet weak var slider: UISlider!
+    @IBOutlet weak var picker: UIPickerView!
+    
+    let pickerData: [PeelVisualization] = [
+        .redToBlack,
+        .blueToBlack,
+        .greenToBlack,
+        .whiteToBlack,
+        .cyanToRed,
+        .magentaToGreen,
+        .yellowToBlue,
+        .onion,
+        .sliceThroughBlackAndWhite
+    ]
+    
+    var boxes = [Coord: SCNNode]()
+    
     let geometryNode = SCNNode()
     let cameraNode = SCNNode()
     var currentAngle: Float = -.pi / 4
     var zoomState: ZoomState = .idle
+    var pickedVisualization: PeelVisualization = .redToBlack
     
     override var prefersStatusBarHidden: Bool {
         return true
@@ -31,14 +67,30 @@ class ViewController: UIViewController {
         
         setupView()
         setupScene()
+        setupAction()
+        
     }
     
-    func setupView() {
-        view.backgroundColor = .gray
-        sceneView.backgroundColor = .gray
+    private func rotatedNormalOfSliceThroughBlackAndWhite(value: Float) -> (Float, Float, Float) {
+        // https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+        let theta = Double(value * .pi * 2)
+        let v = SIMD3(x: 1.0, y: -1.0, z: 0)
+        let k = SIMD3(x: sqrt(3.0) / 3.0, y: sqrt(3.0) / 3.0, z: sqrt(3.0) / 3.0)
+        let c1: SIMD3 = v * cos(theta)
+        let c2: SIMD3 = cross(k, v) * sin(theta)
+        let c3: SIMD3 = k * dot(k, v) * (1 - cos(theta))
+        let r = c1 + c2 + c3
+        return (Float(r.x), Float(r.y), Float(r.z))
     }
     
-    func setupScene() {
+    private func setupView() {
+        view.backgroundColor = .white
+        sceneView.backgroundColor = .white
+        slider.value = 1.0
+        picker.delegate = self
+    }
+    
+    private func setupScene() {
         let scene = SCNScene()
         
         // light
@@ -63,32 +115,34 @@ class ViewController: UIViewController {
         for r in 0..<16 {
             for g in 0..<16 {
                 for b in 0..<16 {
-                    let r = Float(r), g = Float(g), b = Float(b)
+                    let rf = Float(r), gf = Float(g), bf = Float(b)
                     let box = protoBox.copy() as! SCNBox
                     let material = SCNMaterial()
                     material.diffuse.contents = UIColor(
-                        red: CGFloat(r / 15.0),
-                        green: CGFloat(g / 15.0),
-                        blue: CGFloat(b / 15.0),
+                        red: CGFloat(rf / 15.0),
+                        green: CGFloat(gf / 15.0),
+                        blue: CGFloat(bf / 15.0),
                         alpha: 1.0
                     )
                     box.firstMaterial = material
                     let boxNode = SCNNode(geometry: box)
-                    boxNode.position = SCNVector3(Float(g), Float(b), Float(r))
+                    boxNode.position = SCNVector3(gf, bf, rf)
                     geometryNode.addChildNode(boxNode)
+                    boxes[Coord(r: r, g: g, b: b)] = boxNode
                 }
             }
         }
 
         // scene
         scene.rootNode.addChildNode(geometryNode)
-        let panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(panGesture(sender:)))
-        let pinchRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(pinchGesture(sender:)))
-        sceneView.addGestureRecognizer(panRecognizer)
-        sceneView.addGestureRecognizer(pinchRecognizer)
+        sceneView.allowsCameraControl = true
         sceneView.scene = scene
         
         updateGeometryTransform(angle: currentAngle)
+    }
+    
+    private func setupAction() {
+        slider.addTarget(self, action: #selector(sliderChanged), for: .valueChanged)
     }
     
     private func updateGeometryTransform(angle: Float) {
@@ -98,30 +152,185 @@ class ViewController: UIViewController {
         )
     }
     
-    @objc func panGesture(sender: UIPanGestureRecognizer) {
-        let translation = sender.translation(in: sender.view!)
-        var newAngle = Float(translation.x) * Float(.pi / 180.0)
-        newAngle += currentAngle
-        updateGeometryTransform(angle: newAngle)
-        
-        if (sender.state == .ended) {
-            currentAngle = newAngle
+    @objc func sliderChanged() {
+        update()
+    }
+    
+    private func update() {
+        let value = slider.value
+        switch (pickedVisualization) {
+        case .redToBlack:
+            updateByRedWay(value)
+        case .blueToBlack:
+            updateByBlueWay(value)
+        case .greenToBlack:
+            updateByGreenWay(value)
+        case .whiteToBlack:
+            updateByDiagonalWayWhiteToBlack(value)
+        case .cyanToRed:
+            updateByDiagonalWayCyanToRed(value)
+        case .magentaToGreen:
+            updateByDiagonalWayMagentaToGreen(value)
+        case .yellowToBlue:
+            updateByDiagonalWayYellowToBlue(value)
+        case .onion:
+            updateByOnion(value)
+        case .sliceThroughBlackAndWhite:
+            updateBySliceThroughBlackAndWhite(value)
         }
     }
     
-    @objc func pinchGesture(sender: UIPinchGestureRecognizer) {
-        let mitigation: Double = 0.8
-        let compensate: Double = 1.0 - mitigation
-        let scale = Double(sender.scale) * mitigation + compensate
-        switch (zoomState) {
-        case .idle:
-            zoomState = .zooming(start: cameraNode.camera!.orthographicScale)
-        case .zooming(start: let start):
-            let z = max(10.0, min(50.0, start / scale))
-            cameraNode.camera!.orthographicScale = z
-            if (sender.state == .ended) {
-                zoomState = .idle
+    private func updateByRedWay(_ value: Float) {
+        let value = Int(slider.value * 16)
+        for r in 0..<16 {
+            for g in 0..<16 {
+                for b in 0..<16 {
+                    let node = boxes[Coord(r: r, g: g, b: b)]!
+                    node.opacity = r > value ? 0 : 1
+                }
             }
         }
+    }
+    
+    private func updateByGreenWay(_ value: Float) {
+        let value = Int(slider.value * 16)
+        for r in 0..<16 {
+            for g in 0..<16 {
+                for b in 0..<16 {
+                    let node = boxes[Coord(r: r, g: g, b: b)]!
+                    node.opacity = g > value ? 0 : 1
+                }
+            }
+        }
+    }
+    
+    private func updateByBlueWay(_ value: Float) {
+        let value = Int(slider.value * 16)
+        for r in 0..<16 {
+            for g in 0..<16 {
+                for b in 0..<16 {
+                    let node = boxes[Coord(r: r, g: g, b: b)]!
+                    node.opacity = b > value ? 0 : 1
+                }
+            }
+        }
+    }
+    
+    private func updateByDiagonalWayWhiteToBlack(_ value: Float) {
+        let value = Int(slider.value * 45)
+        for r in 0..<16 {
+            for g in 0..<16 {
+                for b in 0..<16 {
+                    let node = boxes[Coord(r: r, g: g, b: b)]!
+                    node.opacity = r + g + b > value ? 0 : 1
+                }
+            }
+        }
+    }
+    
+    private func updateByDiagonalWayCyanToRed(_ value: Float) {
+        let value = Int(slider.value * 45) - 15
+        for r in 0..<16 {
+            for g in 0..<16 {
+                for b in 0..<16 {
+                    let node = boxes[Coord(r: r, g: g, b: b)]!
+                    node.opacity = -r + g + b > value ? 0 : 1
+                }
+            }
+        }
+    }
+    
+    private func updateByDiagonalWayMagentaToGreen(_ value: Float) {
+        let value = Int(slider.value * 45) - 15
+        for r in 0..<16 {
+            for g in 0..<16 {
+                for b in 0..<16 {
+                    let node = boxes[Coord(r: r, g: g, b: b)]!
+                    node.opacity = r - g + b > value ? 0 : 1
+                }
+            }
+        }
+    }
+    
+    private func updateByDiagonalWayYellowToBlue(_ value: Float) {
+        let value = Int(slider.value * 45) - 15
+        for r in 0..<16 {
+            for g in 0..<16 {
+                for b in 0..<16 {
+                    let node = boxes[Coord(r: r, g: g, b: b)]!
+                    node.opacity = r + g - b > value ? 0 : 1
+                }
+            }
+        }
+    }
+    
+    private func updateByOnion(_ value: Float) {
+        let value = value * 7.5
+        for r in 0..<16 {
+            for g in 0..<16 {
+                for b in 0..<16 {
+                    let node = boxes[Coord(r: r, g: g, b: b)]!
+                    let peeledByR = abs(Float(r) - 7.5) > value
+                    let peeledByG = abs(Float(g) - 7.5) > value
+                    let peeledByB = abs(Float(b) - 7.5) > value
+                    let peeled = peeledByR || peeledByG || peeledByB
+                    node.opacity = peeled ? 0 : 1
+                }
+            }
+        }
+    }
+    
+    private func updateBySliceThroughBlackAndWhite(_ value: Float) {
+        let (nx, ny, nz) = rotatedNormalOfSliceThroughBlackAndWhite(value: value)
+        for r in 0..<16 {
+            for g in 0..<16 {
+                for b in 0..<16 {
+                    let node = boxes[Coord(r: r, g: g, b: b)]!
+                    let rf = Float(r), gf = Float(g), bf = Float(b)
+                    let peeled: Bool = nx * rf + ny * gf + nz * bf > 0
+                    node.opacity = peeled ? 0 : 1
+                }
+            }
+        }
+    }
+}
+
+extension ViewController: UIPickerViewDataSource {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return pickerData.count
+    }
+}
+
+extension ViewController: UIPickerViewDelegate {
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        switch (pickerData[row]) {
+        case .redToBlack:
+            return "Red to Black"
+        case .blueToBlack:
+            return "Blue to Black"
+        case .greenToBlack:
+            return "Green to Black"
+        case .whiteToBlack:
+            return "White to Black"
+        case .cyanToRed:
+            return "Cyan to Red"
+        case .magentaToGreen:
+            return "Magenta to Green"
+        case .yellowToBlue:
+            return "Yellow to Blue"
+        case .onion:
+            return "Like Onion"
+        case .sliceThroughBlackAndWhite:
+            return "Slice through Black and White"
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        pickedVisualization = pickerData[picker.selectedRow(inComponent: 0)]
+        update()
     }
 }
