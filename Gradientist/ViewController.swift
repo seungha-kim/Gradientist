@@ -15,7 +15,7 @@ enum ZoomState {
     case zooming(start: Double)
 }
 
-enum PeelVisualization {
+enum PeelVisualization: CaseIterable {
     case redToBlack
     case blueToBlack
     case greenToBlack
@@ -25,6 +25,7 @@ enum PeelVisualization {
     case yellowToBlue
     case onion
     case sliceThroughBlackAndWhite
+    case sphere
 }
 
 struct Coord: Hashable {
@@ -38,17 +39,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var slider: UISlider!
     @IBOutlet weak var picker: UIPickerView!
     
-    let pickerData: [PeelVisualization] = [
-        .redToBlack,
-        .blueToBlack,
-        .greenToBlack,
-        .whiteToBlack,
-        .cyanToRed,
-        .magentaToGreen,
-        .yellowToBlue,
-        .onion,
-        .sliceThroughBlackAndWhite
-    ]
+    let pickerData = PeelVisualization.allCases
     
     var boxes = [Coord: SCNNode]()
     
@@ -177,6 +168,8 @@ class ViewController: UIViewController {
             updateByOnion(value)
         case .sliceThroughBlackAndWhite:
             updateBySliceThroughBlackAndWhite(value)
+        case .sphere:
+            updateBySphere(value)
         }
     }
     
@@ -293,6 +286,21 @@ class ViewController: UIViewController {
             }
         }
     }
+    
+    private func updateBySphere(_ value: Float) {
+        let sphereRadius = value * sqrt(3 * pow(16.0, 2.0)) / 2
+        for r in 0..<16 {
+            for g in 0..<16 {
+                for b in 0..<16 {
+                    let node = boxes[Coord(r: r, g: g, b: b)]!
+                    let rf = Float(r), gf = Float(g), bf = Float(b)
+                    let distance = sqrt(pow(rf - 7.5, 2.0) + pow(gf - 7.5, 2.0) + pow(bf - 7.5, 2.0))
+                    let peeled = distance > sphereRadius
+                    node.opacity = peeled ? 0 : 1
+                }
+            }
+        }
+    }
 }
 
 extension ViewController: UIPickerViewDataSource {
@@ -326,6 +334,8 @@ extension ViewController: UIPickerViewDelegate {
             return "Like Onion"
         case .sliceThroughBlackAndWhite:
             return "Slice through Black and White"
+        case .sphere:
+            return "Sphere"
         }
     }
     
