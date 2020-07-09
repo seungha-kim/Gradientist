@@ -10,6 +10,10 @@ import UIKit
 import SceneKit
 
 class CubeGridView: SCNView {
+    let gridSize: Int = 16
+    var gridLength: Float {
+        Float(gridSize - 1)
+    }
     var boxes = [Coord: SCNNode]()
     let geometryNode = SCNNode()
     let cameraNode = SCNNode()
@@ -57,16 +61,16 @@ class CubeGridView: SCNView {
         
         // box
         let protoBox = SCNBox(width: 1.0, height: 1.0, length: 1.0, chamferRadius: 0.0)
-        for r in 0..<16 {
-            for g in 0..<16 {
-                for b in 0..<16 {
+        for r in 0..<gridSize {
+            for g in 0..<gridSize {
+                for b in 0..<gridSize {
                     let rf = Float(r), gf = Float(g), bf = Float(b)
                     let box = protoBox.copy() as! SCNBox
                     let material = SCNMaterial()
                     material.diffuse.contents = UIColor(
-                        red: CGFloat(rf / 15.0),
-                        green: CGFloat(gf / 15.0),
-                        blue: CGFloat(bf / 15.0),
+                        red: CGFloat(rf / gridLength),
+                        green: CGFloat(gf / gridLength),
+                        blue: CGFloat(bf / gridLength),
                         alpha: 1.0
                     )
                     box.firstMaterial = material
@@ -84,10 +88,10 @@ class CubeGridView: SCNView {
     }
     
     private func update() {
-        let predicate = pickedVisualization.getPredicate(currentValue: currentValue, gridLength: 15.0)
-        for r in 0..<16 {
-            for g in 0..<16 {
-                for b in 0..<16 {
+        let predicate = pickedVisualization.getPredicate(currentValue: currentValue, gridLength: gridLength)
+        for r in 0..<gridSize {
+            for g in 0..<gridSize {
+                for b in 0..<gridSize {
                     let node = boxes[Coord(r: r, g: g, b: b)]!
                     let rf = Float(r), gf = Float(g), bf = Float(b)
                     node.opacity = predicate(rf, gf, bf) ? 0 : 1
