@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A5AC88924B75A0A002C34C0 /* CubeGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5AC88824B75A0A002C34C0 /* CubeGridView.swift */; };
+		2A5AC88B24B75A5F002C34C0 /* CubeGridVisualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5AC88A24B75A5F002C34C0 /* CubeGridVisualization.swift */; };
 		2AA5E3CE24B191320028A39A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AA5E3CD24B191320028A39A /* AppDelegate.swift */; };
 		2AA5E3D024B191320028A39A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AA5E3CF24B191320028A39A /* SceneDelegate.swift */; };
 		2AA5E3D224B191320028A39A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AA5E3D124B191320028A39A /* ViewController.swift */; };
@@ -17,6 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2A5AC88824B75A0A002C34C0 /* CubeGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubeGridView.swift; sourceTree = "<group>"; };
+		2A5AC88A24B75A5F002C34C0 /* CubeGridVisualization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubeGridVisualization.swift; sourceTree = "<group>"; };
 		2AA5E3CA24B191320028A39A /* Gradientist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gradientist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AA5E3CD24B191320028A39A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2AA5E3CF24B191320028A39A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -66,6 +70,8 @@
 				2AA5E3D624B191340028A39A /* Assets.xcassets */,
 				2AA5E3D824B191340028A39A /* LaunchScreen.storyboard */,
 				2AA5E3DB24B191340028A39A /* Info.plist */,
+				2A5AC88824B75A0A002C34C0 /* CubeGridView.swift */,
+				2A5AC88A24B75A5F002C34C0 /* CubeGridVisualization.swift */,
 			);
 			path = Gradientist;
 			sourceTree = "<group>";
@@ -143,8 +149,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				2AA5E3D224B191320028A39A /* ViewController.swift in Sources */,
+				2A5AC88924B75A0A002C34C0 /* CubeGridView.swift in Sources */,
 				2AA5E3CE24B191320028A39A /* AppDelegate.swift in Sources */,
 				2AA5E3D024B191320028A39A /* SceneDelegate.swift in Sources */,
+				2A5AC88B24B75A5F002C34C0 /* CubeGridVisualization.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

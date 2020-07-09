@@ -18,7 +18,7 @@
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="QYJ-af-0pA">
                                 <rect key="frame" x="0.0" y="44" width="414" height="852"/>
                                 <subviews>
-                                    <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2iV-V2-igE">
+                                    <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2iV-V2-igE" customClass="CubeGridView" customModule="Gradientist" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="414" height="612"/>
                                     </sceneKitView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="EUa-Rs-zuJ">
@@ -63,8 +63,8 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="cubeGridView" destination="2iV-V2-igE" id="efO-ld-eVC"/>
                         <outlet property="picker" destination="PDQ-jc-3Il" id="Ffu-ww-D5z"/>
-                        <outlet property="sceneView" destination="2iV-V2-igE" id="B2s-bc-vj8"/>
                         <outlet property="slider" destination="1xJ-0E-Ifb" id="Qnu-70-10E"/>
                     </connections>
                 </viewController>
